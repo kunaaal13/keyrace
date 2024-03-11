@@ -1,22 +1,21 @@
+import FormModal from '@/components/form-modal'
 import { createFileRoute } from '@tanstack/react-router'
+import { useState } from 'react'
 import { Button } from '../components/ui/button'
-import { v4 as uuidv4 } from 'uuid'
 
 export const Route = createFileRoute('/')({
   component: Page,
 })
 
 function Page() {
-  function createRace() {
-    const inviteCode = uuidv4()
-
-    console.log('inviteCode:', inviteCode)
-  }
+  const [formModal, setFormModal] = useState<'create' | 'join' | null>(null)
 
   return (
     <div className='w-full min-h-dvh flex flex-col items-center py-20 bg-[#0a0911] text-white'>
       <div className='w-3/4 h-full space-y-10 flex flex-col items-center'>
-        <h1 className='text-[5rem] font-mono font-bold text-center'>KeyRace</h1>
+        <h1 className='text-[5rem] font-mono font-bold text-center tracking-wider'>
+          KeyRace
+        </h1>
 
         <div className='flex items-center justify-center w-4/5'>
           <p className='text-lg text-center'>
@@ -39,14 +38,31 @@ function Page() {
             className='bg-white text-black'
             variant={'secondary'}
             size={'lg'}
+            onClick={() => setFormModal('join')}
           >
             Join a Race
           </Button>
 
-          <Button size={'lg'} variant={'secondary'} onClick={createRace}>
+          <Button
+            size={'lg'}
+            variant={'secondary'}
+            onClick={() => setFormModal('create')}
+          >
             Create a Race
           </Button>
         </div>
+
+        {formModal && (
+          <FormModal
+            variant={formModal}
+            open
+            onOpenChange={(open) => {
+              if (!open) {
+                setFormModal(null)
+              }
+            }}
+          />
+        )}
       </div>
     </div>
   )
