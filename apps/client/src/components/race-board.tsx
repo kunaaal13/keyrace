@@ -1,23 +1,33 @@
 import useRaceContext from '@/context/use-race-context'
 import { cn } from '@/lib/utils'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from './ui/button'
+import useCountdownHook from './use-countdown-hook'
 
 interface RaceBoardProps {
   copyRaceId: () => void
 }
 
 function RaceBoard({ copyRaceId }: RaceBoardProps) {
-  const {
-    paragraph,
-    status,
-    startGame,
-    hostId,
-    socket,
-    onPlayerType,
-    timeLeft,
-  } = useRaceContext()
+  const { paragraph, status, startGame, hostId, socket, onPlayerType } =
+    useRaceContext()
   const [input, setInput] = useState('')
+
+  const { timeLeft, startCountdown, resetTimer } = useCountdownHook({
+    initialTime: 60,
+  })
+
+  useEffect(() => {
+    if (socket) {
+      socket.on('game-started', () => {
+        startCountdown()
+      })
+
+      socket.on('game-finished', () => {
+        resetTimer()
+      })
+    }
+  }, [socket])
 
   function renderParagraph() {
     const splitParagraph: string[] = paragraph.split('')
@@ -85,7 +95,7 @@ function RaceBoard({ copyRaceId }: RaceBoardProps) {
         <div className='space-y-5'>
           {status === 'playing' && (
             <div>
-              <p className='text-xl'>Time Left: {timeLeft}</p>
+              <p className='text-xl'>Time Left: {timeLeft} seconds</p>
             </div>
           )}
           <div className='w-full h-full border rounded-md'>

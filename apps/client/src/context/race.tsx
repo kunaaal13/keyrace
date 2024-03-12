@@ -1,4 +1,3 @@
-import useCountdownHook from '@/components/use-countdown-hook'
 import { createContext, useEffect, useState } from 'react'
 import { Socket, io } from 'socket.io-client'
 import { toast } from 'sonner'
@@ -24,7 +23,6 @@ type RaceContext = {
   hostId: string
   startGame: () => void
   onPlayerType: (text: string) => void
-  timeLeft: number
 }
 
 // Assuming you have exported the RaceContext type
@@ -45,10 +43,6 @@ export default function RaceContextProvider({
   const [players, setPlayers] = useState<Player[]>([])
   const [paragraph, setParagraph] = useState<string>(``)
   const [hostId, setHostId] = useState<string>('')
-
-  const { timeLeft, startCountdown, resetTimer } = useCountdownHook({
-    initialTime: 60,
-  })
 
   useEffect(() => {
     const socket = io('ws://localhost:8080', {
@@ -84,7 +78,6 @@ export default function RaceContextProvider({
     socket.on('game-started', (paragraph: string) => {
       setParagraph(paragraph)
       setStatus('playing')
-      startCountdown()
 
       toast.success('Game started...')
     })
@@ -92,7 +85,6 @@ export default function RaceContextProvider({
     socket.on('game-finished', (winner: Player) => {
       setStatus('finished')
       setParagraph('')
-      resetTimer()
 
       toast.success(`${winner.name} won the game!`)
     })
@@ -150,7 +142,6 @@ export default function RaceContextProvider({
         hostId,
         startGame,
         onPlayerType,
-        timeLeft,
       }}
     >
       {children}

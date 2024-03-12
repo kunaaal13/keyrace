@@ -1,30 +1,35 @@
-import { useState } from 'react'
+// Use countdown hook to create a countdown timer it takes an initial time and returns the time left and functions to start and reset the timer.
 
-interface CountdownHook {
+import { useEffect, useState } from 'react'
+
+interface CountdownHookProps {
   initialTime: number
 }
 
-function useCountdownHook(
-  { initialTime }: CountdownHook = { initialTime: 60 }
-) {
+export default function useCountdownHook({ initialTime }: CountdownHookProps) {
   const [timeLeft, setTimeLeft] = useState(initialTime)
+  const [timerActive, setTimerActive] = useState(false)
 
-  let interval: NodeJS.Timeout
+  useEffect(() => {
+    let interval: NodeJS.Timeout
+
+    if (timerActive) {
+      interval = setInterval(() => {
+        setTimeLeft((prev) => prev - 1)
+      }, 1000)
+    }
+
+    return () => clearInterval(interval)
+  }, [timerActive])
 
   function startCountdown() {
-    interval = setTimeout(() => {
-      setTimeLeft((prev) => prev - 1)
-    }, 1000)
+    setTimerActive(true)
   }
 
   function resetTimer() {
-    if (interval) {
-      clearTimeout(interval)
-    }
     setTimeLeft(initialTime)
+    setTimerActive(false)
   }
 
   return { timeLeft, startCountdown, resetTimer }
 }
-
-export default useCountdownHook
