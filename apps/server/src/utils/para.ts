@@ -13,7 +13,7 @@ function getParagraphFromString() {
 
 async function getParagraph() {
   try {
-    const response = await fetch('http://metaphorpsum.com/paragraphs/10')
+    const response = await fetch('http://metaphorpsum.com/paragraphs/2/5')
 
     if (!response.ok) {
       throw new Error('Failed to fetch paragraph')

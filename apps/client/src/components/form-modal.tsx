@@ -32,7 +32,7 @@ function FormModal({ variant, open, onOpenChange }: FormModalProps) {
         raceId: inviteCode,
       },
       search: {
-        name: 'Kunaaal',
+        name,
       },
     })
   }

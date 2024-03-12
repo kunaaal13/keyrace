@@ -50,7 +50,7 @@ class Game {
     // Start game listener
     socket.on('start-game', async () => {
       // if game is not waiting, throw error
-      if (this.status !== 'waiting') {
+      if (this.status === 'playing') {
         socket.emit('error', 'Game has already started')
         return
       }
@@ -78,8 +78,17 @@ class Game {
 
       setTimeout(() => {
         this.status = 'finished'
-        this.io.to(this.id).emit('game-finished')
-        this.io.to(this.id).emit('players', this.players)
+
+        // Find the winner
+        let winner = this.players[0]
+        this.players.forEach((player) => {
+          if (player.score > winner.score) {
+            winner = player
+          }
+        })
+
+        this.io.to(this.id).emit('game-finished', winner)
+        // this.io.to(this.id).emit('players', this.players)
       }, 1000 * 60)
     })
 
@@ -112,7 +121,7 @@ class Game {
       // Send updated player list to all players
       this.io.to(this.id).emit('player-score', {
         id: socket.id,
-        score,
+        score: score * 10,
       })
     })
 
@@ -138,9 +147,9 @@ class Game {
 
     // Send player joined event to all players
     this.io.to(this.id).emit('player-joined', { id, name, score: 0 })
+    this.io.to(this.id).emit('players', this.players)
 
     // Notify player that he has joined the game and send players list and host name
-    socket.emit('player', this.players)
     socket.emit('new-host', this.hostId)
 
     // init listeners

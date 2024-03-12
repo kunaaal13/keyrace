@@ -7,7 +7,12 @@ export const Route = createRootRoute({
     <>
       <Outlet />
       <TanStackRouterDevtools />
-      <Toaster />
+      <Toaster
+        position='bottom-right'
+        toastOptions={{
+          duration: 1500,
+        }}
+      />
     </>
   ),
 })
